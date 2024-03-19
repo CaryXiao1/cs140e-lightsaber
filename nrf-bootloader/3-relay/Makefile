@@ -6,7 +6,7 @@ PROGS := relay.c
 # COMMON_SRC := interrupt-asm.S
 
 # uncomment if you want it to automatically run.
-RUN=1
+RUN=0
 
 # change if you don't want this one.
 # BOOTLOADER = pi-install

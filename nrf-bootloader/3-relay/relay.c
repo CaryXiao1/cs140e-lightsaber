@@ -5,40 +5,45 @@
 // This is the first program sent to the USB-connected pi, which
 // enables the USB-connected pi to send the second program
 // via NFC.   
+// 
+// NOTE!!!!! this program only runs correctly under my-install-relay.
 ////////////////////////////////////////////////////////////////
 
 #include "rpi.h"
 #include "memmap.h"
+#include "nrf-test.h"
 
-// #include "boot-crc32.h"  // has the crc32 implementation.
-// #include "boot-defs.h"   // protocol opcode values.
-// #include "put-code.h"
-// #include "boot-crc32.h"
-// #include "boot-defs.h"
-// #include "nrf-default-values.h"
+enum {
+    START = 0x8000, // address at the start of the program
+};
 
 void notmain(void) {
     printk("Starting up relay on UART pi.\n");
     // test out the bss start and end code, see if it equals the size of the overall stuff
-    uint32_t *start = (uint32_t *) &put32;
     uint32_t *end = __prog_end__;
+    uint8_t *size = ((uint8_t *)end - START);
     // if ((addr >= (uint32_t) &put32 && addr <= (uint32_t) __prog_end__) || 
 
-    printk("start=%x, end=%x, diff=%d\n", start, end, ((uint8_t *)end) - ((uint8_t *)start));
+    printk("start=%x, end=%x, diff=%d\n", START, end, size);
     
     // look at header
-    uint32_t *prog_2_start = __prog_end__ + 8; // 8 = 32 / sizeof(uint32_t)
+    uint32_t *prog_2_start = __prog_end__ + 1; // 8 = 32 / sizeof(uint32_t)
 
+// set if to 1 below to debug the start location / first bits. Can run 
+// "my-install-relay relay.bin" to ensure each address matches up exactly. 
+#if 0
+    printk("Comparing start of program with program past end.\n");
     for (int i = 0; i < 50; i++) {
-        printk("i=%d, val=%d\n", i, *(prog_2_start + i));
+        uint32_t instr_start = *((uint32_t *)START + i);
+        uint32_t instr_post = *(prog_2_start + i);
+        printk("i=%d, val=%x      vs.       val=%x\n", i, instr_start, instr_post);
+        // assert(instr_start == instr_post);
     }
+#endif
 
+    uint32_t s2 = *(prog_2_start - 1);
 
-    printk("target addr=%x\n", prog_2_start);
-
-    printk("bss=%x, bss_end=%x\n", __bss_start__, __bss_end__);
-    printk("header length=%d\n", *prog_2_start);
-    printk("size of prog2=%d\n", *(prog_2_start + 1));
+    printk("2nd program size=%d\n", s2);
 
     // TODO: continue on this code above to determine how to get the second program
 

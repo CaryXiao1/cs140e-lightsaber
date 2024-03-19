@@ -37,7 +37,7 @@ static const char *RELAY_FILENAME = "../3-relay/relay.bin";
  * 
 */
 void *read_file_relay(unsigned *size, const char *name1, const char *name2) {
-    const uint32_t HEADER_SIZE = 8; // contains 1. header size and 2. 
+    const uint32_t HEADER_SIZE = 4; // contains 1. header size and 2. 
     struct stat info;
     if (stat(name1, &info) != 0) panic("file path: stat() failed on name1.");
     unsigned s1 = info.st_size;
@@ -54,9 +54,9 @@ void *read_file_relay(unsigned *size, const char *name1, const char *name2) {
 
     if (s1 != 0) read_exact(fd1, buf, s1);
     // add header
-    char *head_start = buf + s1 + 4; // TODO: maybe ensure it's stored at aligned address?
-    *((uint32_t *) head_start) = HEADER_SIZE;
-    *((uint32_t *) head_start + 1) = s2;
+    char *head_start = buf + s1; 
+    assert(((unsigned long) head_start & 0b11l) == 0); // alert if we ever need to consider case where head_start is not aligned
+    *((uint32_t *) head_start) = s2;
     
     if (s2 != 0) read_exact(fd2, buf + s1 + HEADER_SIZE, s2);
     *size = s1 + s2 + HEADER_SIZE;
