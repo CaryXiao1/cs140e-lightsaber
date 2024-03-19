@@ -1,0 +1,5 @@
+opened tty port </dev/cu.usbserial-210>.
+pi-install: tty-usb=</dev/cu.usbserial-210> program=<./main.bin> about to boot
+TRACE:simple_boot: sending 2069992 bytes, crc32=964df81d
+waiting for a start
+putting code

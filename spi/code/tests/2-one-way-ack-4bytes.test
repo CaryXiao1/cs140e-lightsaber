@@ -1,0 +1,3 @@
+TRACE:notmain:configuring reliable (acked) server= with 4 nbyte msgs
+TRACE:one_way_ack:sent 100 ack'd packets
+tests/2-one-way-ack-4bytes.c:one_way_ack:32:DEBUG:ERROR: Assertion `x == i` failed.
