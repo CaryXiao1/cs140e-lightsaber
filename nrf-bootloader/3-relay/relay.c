@@ -15,7 +15,7 @@
 enum {
     START = 0x8000, // address at the start of the program
     timeout_usec = 1000, 
-    nbytes = 32,
+    nbytes = 4,
 };
 static const int PRINT_DEBUG = 1;
 
@@ -53,36 +53,21 @@ static inline int recv32(nrf_t *nic, uint32_t *out) {
 // modified from code-nrf/tests/3-one-way-ack-Nbytes.c.
 // 
 static void
-one_way_ack(nrf_t *server, uint32_t client_addr, uint32_t *data, uint32_t size, int verbose_p) {
+one_way_ack(nrf_t *server, uint32_t client_addr, uint32_t *data, uint32_t size) {
     unsigned ntimeout = 0, npackets = 0;
     // figure out if we need to deal with case where size % 4 != 0
     assert(size % 4 == 0);
     for(unsigned i = 0; i < size / 4; i++) {
-        if(verbose_p && i  && i % 100 == 0)
+        if(i && i % 100 == 0)
             trace("sent %d ack'd packets\n", i);
-
-        // output("sent %d\n", i);
         if(!send32_ack(server, client_addr, *(data + i)))
             panic("send failed\n");
+        if (i == 0) {
+            printk("sent %d as header.\n", *data);
+        }
 
-        // uint32_t x;
-        // int ret = recv32(client, &x);
-        // output("ret=%d, got %d\n", ret, x);
-        // if(ret == nbytes) {
-        //     if(x != i)
-        //         nrf_output("client: received %d (expected=%d)\n", x,i);
-        //     assert(x == i);
-        //     npackets++;
-        // } else {
-        //     if(verbose_p) 
-        //         output("receive failed for packet=%d, nbytes=%d ret=%d\n", i, nbytes, ret);
-        //     ntimeout++;
-        // }
     }
-    // trace("trial: total successfully sent %d ack'd packets lost [%d]\n",
-    //     npackets, ntimeout);
-    trace("finished sending code.");
-    // assert((ntimeout + npackets) == ntrial);
+    trace("finished sending code. sent a total of %d packets.\n", size / 4);
 }
 #endif
 
@@ -98,7 +83,7 @@ void notmain(void) {
     printk("start=%x, end=%x, diff=%d\n", START, end, size);
     
     // look at header
-    uint32_t *prog_2_start = __prog_end__+ 1; // 8 = 32 / sizeof(uint32_t)
+    uint32_t *head_start = __prog_end__; // 8 = 32 / sizeof(uint32_t)
 
 // set if to 1 below to debug the start location / first bits. Can run 
 // "my-install-relay relay.bin" to ensure each address matches up exactly. 
@@ -106,26 +91,32 @@ void notmain(void) {
     printk("Comparing start of program with program past end.\n");
     for (int i = 0; i < 10; i++) {
         uint32_t instr_start = *((uint32_t *)START + i);
-        uint32_t instr_post = *(prog_2_start + i);
+        uint32_t instr_post = *(head_start + 1 + i);
         printk("i=%d, val=%x       vs.       val=%x\n", i, instr_start, instr_post);
         // assert(instr_start == instr_post);
     }
 #endif
 
-    uint32_t s2 = *(prog_2_start - 1);
-
-    printk("2nd program size=%d\n", s2);
-
-    // nrf_t *c = client_mk_ack(client_addr, s2);
-
-    // code below performs 
 #if 1
+    // move 2nd program into heap (but first into stack!)
+    uint32_t s2 = *(head_start);
+    printk("2nd program size=%d\n", s2);
+    printk("Moving 2nd program to heap...\n");
+    uint32_t data_stack[s2 + 4]; // need to put program in heap first before putting in heap!
+    data_stack[0] = s2;
+    memcpy(data_stack + 1, head_start + 1, s2);
+    uint32_t *data = kmalloc(s2 + 4);
+    memcpy(data, data_stack, s2 + 4);
+    
+    // send code to client
     trace("configuring reliable (acked) server=[%x] with %d nbyte msgs\n",
                 server_addr, nbytes);
     nrf_t *s = server_mk_ack(server_addr, nbytes);
     // trace("finished server_mk_ack and starting start_stat\n");
     nrf_stat_start(s);
-    one_way_ack(s, client_addr, prog_2_start, s2, 1);
+    // *head_start = s2;
+    // printk("%d\n", *head_start);
+    one_way_ack(s, client_addr, head_start, s2 + 4); // need to add header & its space
 #endif
 
     // reset the times so we get a bit better measurement.
