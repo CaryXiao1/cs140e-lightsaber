@@ -102,7 +102,7 @@ void notmain(void) {
 
 // set if to 1 below to debug the start location / first bits. Can run 
 // "my-install-relay relay.bin" to ensure each address matches up exactly. 
-#if 0
+#if 1
     printk("Comparing start of program with program past end.\n");
     for (int i = 0; i < 10; i++) {
         uint32_t instr_start = *((uint32_t *)START + i);
@@ -119,11 +119,11 @@ void notmain(void) {
     // nrf_t *c = client_mk_ack(client_addr, s2);
 
     // code below performs 
-#if 0
+#if 1
     trace("configuring reliable (acked) server=[%x] with %d nbyte msgs\n",
                 server_addr, nbytes);
     nrf_t *s = server_mk_ack(server_addr, nbytes);
-    trace("finished server_mk_ack and starting start_stat\n");
+    // trace("finished server_mk_ack and starting start_stat\n");
     nrf_stat_start(s);
     one_way_ack(s, client_addr, prog_2_start, s2, 1);
 #endif
