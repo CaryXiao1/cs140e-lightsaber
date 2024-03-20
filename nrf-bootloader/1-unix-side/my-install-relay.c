@@ -56,10 +56,10 @@ void *read_file_relay(unsigned *size, const char *name1, const char *name2) {
     // set start of next program, round up to next multiple of 32
     // based on my (Cary's) understanding, __prog_end__ on the pi needs to be a multiple of 32
     // so we do the same to align the code with __prog_end__. 
-    uint32_t offset_correction = (((unsigned long)buf + s1) % 32 != 0) ? (32 - ((unsigned long)buf + s1) % 32) : 0;
+    uint32_t offset_correction = (((unsigned long)buf + s1) % 32 != 0) ? (8 - ((unsigned long)buf + s1) % 8) + 16 : 0; // (((unsigned long)buf + s1) % 32 != 0) ? (32 - ((unsigned long)buf + s1) % 32) : 0;
     uint32_t *head_start = (uint32_t *)(buf + s1 + offset_correction); // round up to next multiple of 8
     printf("buf=%lx, head_start=%lx, size=%lu\n", (unsigned long)buf, (unsigned long) head_start, (unsigned long) head_start - (unsigned long) buf);
-    assert(((unsigned long) head_start & 0xfl) == 0); // make sure 
+    assert(((unsigned long) head_start & 0b111l) == 0); // make sure 
     *(head_start) = s2;
     
     if (s2 != 0) read_exact(fd2, head_start + (HEADER_SIZE / 4), s2);

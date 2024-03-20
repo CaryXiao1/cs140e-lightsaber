@@ -12,8 +12,14 @@
 #include "rpi.h"
 #include "memmap.h"
 
+enum {
+    START = 0x8000, // address at the start of the program
+    timeout_usec = 1000, 
+    nbytes = 32,
+};
+static const int PRINT_DEBUG = 1;
 
-#if 0
+#if 1
 #include "nrf-test.h"
 #include "nrf-default-values.h"
 
@@ -80,11 +86,7 @@ one_way_ack(nrf_t *server, uint32_t client_addr, uint32_t *data, uint32_t size, 
 }
 #endif
 
-enum {
-    START = 0x8000, // address at the start of the program
-    timeout_usec = 1000, 
-    nbytes = 32
-};
+
 
 void notmain(void) {
     printk("Starting up relay on UART pi.\n");
@@ -100,9 +102,9 @@ void notmain(void) {
 
 // set if to 1 below to debug the start location / first bits. Can run 
 // "my-install-relay relay.bin" to ensure each address matches up exactly. 
-#if 1
+#if 0
     printk("Comparing start of program with program past end.\n");
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 10; i++) {
         uint32_t instr_start = *((uint32_t *)START + i);
         uint32_t instr_post = *(prog_2_start + i);
         printk("i=%d, val=%x       vs.       val=%x\n", i, instr_start, instr_post);
@@ -119,8 +121,9 @@ void notmain(void) {
     // code below performs 
 #if 0
     trace("configuring reliable (acked) server=[%x] with %d nbyte msgs\n",
-                server_addr, s2);
+                server_addr, nbytes);
     nrf_t *s = server_mk_ack(server_addr, nbytes);
+    trace("finished server_mk_ack and starting start_stat\n");
     nrf_stat_start(s);
     one_way_ack(s, client_addr, prog_2_start, s2, 1);
 #endif
