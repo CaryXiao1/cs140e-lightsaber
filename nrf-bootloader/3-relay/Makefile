@@ -5,6 +5,12 @@
 PROGS := relay.c
 # COMMON_SRC := interrupt-asm.S
 
+COMMON_SRC := nrf-hw-support.c nrf-public.c nrf-driver.c
+STAFF_OBJS += $(CS140E_2024_PATH)/libpi/staff-objs/new-spi.o
+STAFF_OBJS += ./staff-nrf-driver.o
+
+LIBS += $(CS140E_2024_PATH)/lib/libgcc.a
+
 # uncomment if you want it to automatically run.
 RUN=0
 

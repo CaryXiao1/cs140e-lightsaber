@@ -43,8 +43,8 @@ void *read_file_relay(unsigned *size, const char *name1, const char *name2) {
     unsigned s1 = info.st_size;
     if (stat(name2, &info) != 0) panic("file path: stat() failed on name2.");
     unsigned s2 = info.st_size;
-    // round up to next multiple of 4
-    unsigned s_up = s1 + s2 + HEADER_SIZE + 4;
+    // round up to next multiple of 32!
+    unsigned s_up = s1 + s2 + HEADER_SIZE + 32;
     trace("file1 size=%d, file2 size=%d, HEADER_SIZE=%d, s_up=%d\n", s1, s2, HEADER_SIZE, s_up);
     // alloc space
     char *buf = calloc(1, s_up);
@@ -53,12 +53,16 @@ void *read_file_relay(unsigned *size, const char *name1, const char *name2) {
 
 
     if (s1 != 0) read_exact(fd1, buf, s1);
-    // add header
-    char *head_start = buf + s1; 
-    assert(((unsigned long) head_start & 0b11l) == 0); // alert if we ever need to consider case where head_start is not aligned
-    *((uint32_t *) head_start) = s2;
+    // set start of next program, round up to next multiple of 32
+    // based on my (Cary's) understanding, __prog_end__ on the pi needs to be a multiple of 32
+    // so we do the same to align the code with __prog_end__. 
+    uint32_t offset_correction = (((unsigned long)buf + s1) % 32 != 0) ? (32 - ((unsigned long)buf + s1) % 32) : 0;
+    uint32_t *head_start = (uint32_t *)(buf + s1 + offset_correction); // round up to next multiple of 8
+    printf("buf=%lx, head_start=%lx, size=%lu\n", (unsigned long)buf, (unsigned long) head_start, (unsigned long) head_start - (unsigned long) buf);
+    assert(((unsigned long) head_start & 0xfl) == 0); // make sure 
+    *(head_start) = s2;
     
-    if (s2 != 0) read_exact(fd2, buf + s1 + HEADER_SIZE, s2);
+    if (s2 != 0) read_exact(fd2, head_start + (HEADER_SIZE / 4), s2);
     *size = s1 + s2 + HEADER_SIZE;
     close(fd1);
     close(fd2);
