@@ -2,7 +2,7 @@
 # LPI = ../staff-objs/libpi.a
 
 # include staff for everything so can run completely.
-PROGS := relay.c
+PROGS := relay.c nrf-bootloader-test.c
 # COMMON_SRC := interrupt-asm.S
 
 COMMON_SRC := nrf-hw-support.c nrf-public.c nrf-driver.c
