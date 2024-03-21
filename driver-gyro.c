@@ -30,6 +30,8 @@
 #include "rpi.h"
 #include "mpu-6050.h"
 
+
+
 void notmain(void) {
     delay_ms(100);   // allow time for i2c/device to boot up.
     i2c_init();
@@ -59,12 +61,15 @@ void notmain(void) {
     for(int i = 0; i < 100000; i++) {
         imu_xyz_t xyz_raw = gyro_rd(&g);
         uint32_t g_const = 25000; // 25000 for swing, TODO: figure out the tracking of collisions
+        uint32_t scale_max = g_const * g_const; 
         // output("reading gyro %d\n", i);
 
         // get length of overall movement from 3 component
         uint32_t overall = xyz_raw.y * xyz_raw.y + xyz_raw.z * xyz_raw.z; // xyz_ra w.x * xyz_raw.x + 
+        uint32_t accel_mag = clamp(overall, 0, scale_max) / scale_max; 
         if (overall >= g_const * g_const) {
             printk("swing! id=%d\n", i);
+
         }
 
 

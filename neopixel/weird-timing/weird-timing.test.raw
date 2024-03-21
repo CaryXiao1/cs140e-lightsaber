@@ -1,0 +1,33 @@
+opened tty port </dev/cu.usbserial-110>.
+pi-install: tty-usb=</dev/cu.usbserial-110> program=<./weird-timing.bin> about to boot
+TRACE:simple_boot: sending 4336 bytes, crc32=2a758bdc
+waiting for a start
+putting code
+pi sent print: <Ekin: success: Received the program!>
+pi sent print: <Ekin: UART>
+bootloader: Done.
+listening on ttyusb=</dev/cu.usbserial-110>
+no icache: trial=3: checking alignment
+	aligned success: expected 8 cycles, got 8 cycles
+	non-align success: expected > 8, have overhead of = 114 cycles
+no icache: trial=10: checking alignment
+	aligned success: expected 8 cycles, got 8 cycles
+	non-align success: expected > 8, have overhead of = 39 cycles
+no icache: trial=10: checking alignment
+	aligned success: expected 8 cycles, got 8 cycles
+	non-align success: expected > 8, have overhead of = 39 cycles
+icache on: trial=0: checking alignment
+	aligned success: expected 8 cycles, got 8 cycles
+	non-align fail: expected > 8, have overhead of 8
+icache on: trial=1: checking alignment
+	aligned success: expected 8 cycles, got 8 cycles
+	non-align fail: expected > 8, have overhead of 8
+icache on: trial=2: checking alignment
+	aligned success: expected 8 cycles, got 8 cycles
+	non-align fail: expected > 8, have overhead of 8
+done!
+DONE!!!
+
+Saw done
+
+bootloader: pi exited.  cleaning up
