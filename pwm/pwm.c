@@ -144,8 +144,8 @@ void audio_init(int sample_rate) {
  * should pass in a freq of 19 200 000 / 16)
  */
 void pwm_set_clock(int freq) {
-    int timer = F_OSC;
-    int source;
+    int timer = F_OSC; // Use the fastest clock, 19.2MHz oscillator
+    int source = 1;
 
     // 2^20 = 1048576
     // 2^21 = 2097152
@@ -160,14 +160,6 @@ void pwm_set_clock(int freq) {
     7 = HDMI auxiliary
     8-15 = GND
     */
-    if (timer == F_OSC) { // 19 200 000 = 2^11 x 3 * 5^5
-        source = 1;
-    } else if (timer == F_PLLD) {
-        source = 6;
-    } else {
-        source = 1;
-        timer = F_OSC;
-    }
 
     int divisor  = timer / freq; // for freq=16, divisor = 1.2e6
     int fraction = (timer % freq) * 4096 / freq; // fraction = 0
