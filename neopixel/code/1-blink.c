@@ -8,7 +8,7 @@
 #include "neopixel.h"
 
 // the pin used to control the light strip.
-enum { pix_pin = 21 };
+enum { pix_pin = 17 }; // used to be 21, but is 14 on the lightsaber
 
 void notmain(void) {
     // if you don't do this, the granularity is too large for the timing
