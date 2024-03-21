@@ -3,8 +3,8 @@
  * a light array.
  */
 #include "rpi.h"
-#include "WS2812B.h"
-#include "neopixel.h"
+#include "neopixel/WS2812B.h"
+#include "neopixel/neopixel.h"
 
 // the pin used to control the light strip.
 enum { pix_pin = 21 };
@@ -15,7 +15,9 @@ enum { pix_pin = 21 };
 void place_cursor_rainbow(neo_t h, int shift) {
     int i = 0; // shift;
     while (i < 64) {
-        neopix_write(h,i,0x0,0x88,0x0);
+
+        // g, r, b
+        neopix_write(h,i,0x0,0x10,0x0);
         i++;
     }
 

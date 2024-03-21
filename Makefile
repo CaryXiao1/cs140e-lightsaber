@@ -1,5 +1,8 @@
 # list out the driver program source
-PROGS += play_wav_light.c
+# PROGS += play_wav_light.c
+# PROGS += lightsaber-light-static.c
+# PROGS += driver-gyro.c
+PROGS += light-intensity.c 
 
 LIBS += ./libgcc.a
 
@@ -12,6 +15,7 @@ STAFF_OBJS += $(CS140E_2024_PATH)/libpi/staff-objs/kmalloc.o
 COMMON_SRC += pwm/pwm.c audio/audio.c fat32/fat32.c
 COMMON_SRC += fat32/mbr.c fat32/pi-sd.c fat32/mbr-helpers.c fat32/fat32-helpers.c fat32/fat32-lfn-helpers.c fat32/external-code/unicode-utf8.c fat32/external-code/emmc.c fat32/external-code/mbox.c 
 COMMON_SRC += neopixel/neopixel.c
+COMMON_SRC += i2c/i2c.c
 
 CFLAGS_EXTRA  = -I fat32/external-code -I i2s/ -I nrf/ -I pwm/ -I fat32/ -I audio/
 

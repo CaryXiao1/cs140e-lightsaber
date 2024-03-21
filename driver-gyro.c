@@ -65,6 +65,7 @@ void notmain(void) {
         uint32_t overall = xyz_raw.y * xyz_raw.y + xyz_raw.z * xyz_raw.z; // xyz_ra w.x * xyz_raw.x + 
         if (overall >= g_const * g_const) {
             printk("swing! id=%d\n", i);
+            
         }
 
 
