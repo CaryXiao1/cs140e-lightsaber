@@ -47,3 +47,10 @@ Todo!
 While this is not necessarily related to computer systems, we did spend a non-negligible amount of time CADing and 3D-printing the hilt that housed all our devices. To see .obj and .stl files exported from Fusion 360 
 
 ![Fusion 360 screenshot of lightsaber hilt](images/lightsaber-design.png)
+
+# Additional Protocols
+## I2S
+
+## I2C
+
+## WS2812 (Neopixel)
