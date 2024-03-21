@@ -110,6 +110,7 @@ void set_sample_rate(int sample_rate) {
 }
 
 void audio_init(int sample_rate) {
+    // sample_rate = 44.1kHz
     gpio_set_function(18, GPIO_FUNC_ALT5);
     gpio_set_function(12, GPIO_FUNC_ALT0);
     delay_ms(2);
@@ -119,8 +120,8 @@ void audio_init(int sample_rate) {
 //    pwm_set_clock( 19200000 / CLOCK_DIVISOR ); // 9600000 Hz
 
     int clock_rate = 19200000 / 2; // 9600000 Hz
-    int range = clock_rate / sample_rate;
-    pwm_set_clock( clock_rate);
+    int range = clock_rate / sample_rate; //  clock_rate = output frequency
+    pwm_set_clock(clock_rate); // 
     delay_ms(2);
 
     pwm_set_mode( 0, PWM_SIGMADELTA );
@@ -133,8 +134,9 @@ void audio_init(int sample_rate) {
     pwm_enable(1);
 
     // pwm range is 1024 cycles
-    pwm_set_range(0, range);
-    pwm_set_range(1, range);
+    pwm_set_range(0, range); // range is (9.6MHz / 44.1kHz)
+    pwm_set_range(1, range); 
+    // FIFO data is x / (9.6MHz / 44.1kHz = 217.687075Hz)
     delay_ms(2);
 }
 
@@ -144,34 +146,25 @@ void audio_init(int sample_rate) {
  * should pass in a freq of 19 200 000 / 16)
  */
 void pwm_set_clock(int freq) {
+    // freq = 9600000 Hz 
     int timer = F_OSC; // Use the fastest clock, 19.2MHz oscillator
     int source = 1;
 
-    // 2^20 = 1048576
-    // 2^21 = 2097152
-    /* source
-    0 = GND
-    1 = oscillator
-    2 = testdebug0
-    3 = testdebug1
-    4 = PLLA per
-    5 = PLLC per
-    6 = PLLD per
-    7 = HDMI auxiliary
-    8-15 = GND
-    */
-
+    // divisor = 2, divisor = divi
     int divisor  = timer / freq; // for freq=16, divisor = 1.2e6
     int fraction = (timer % freq) * 4096 / freq; // fraction = 0
+    // max fraction is 2^12 = 4096
     int mash = fraction ? CM_MASH1 : CM_MASH0;
 
-    if(      mash == CM_MASH0 && divisor < 1 )
+    // output frequency will be (timer / divisor) = freq = 9.6MHz
+    if( mash == CM_MASH0 && divisor < 1 )
         divisor = 1;
     else if( mash == CM_MASH1 && divisor < 2 )
         divisor = 2;
     if (divisor > 4095)
         divisor = 4095;
 
+    // Set fraction, clamp fraction
     if (fraction > 4095)
         fraction = 4095;
 
@@ -184,9 +177,7 @@ void pwm_set_clock(int freq) {
     while (GET32(CM_PWMCTL) & CM_BUSY) ;     // wait for clock to stop
 
     PUT32(CM_PWMDIV, BM_PASSWORD | (divisor << 12) | fraction);
-
     PUT32(CM_PWMCTL, BM_PASSWORD | CM_ENABLE | mash | source);
-
     PUT32(PWM_CTL, pwm); // restore pwm control register
 }
 

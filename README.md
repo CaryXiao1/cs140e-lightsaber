@@ -55,7 +55,7 @@ PWM, or Pulse Width Modulation, is a means of emulating analog IO by setting the
 
 ### Method
 
-1. To use hardware PWM, we refer to section 9 in the ARM peripherals manual. We first had to set the proper function of PWM pin 18 (`GPIO_FUNC_ALT5`). Then, similar to I2S, we set the GPIO clock manager to operate using the
+1. To use hardware PWM, we refer to section 9 in the ARM peripherals manual. We first had to set the proper function of PWM pin 18 (`GPIO_FUNC_ALT5`). Then, similar to I2S, we set the GPIO clock manager to operate using the 19.2MHz oscillator. We use a sampling frequency of around 44100 (44.1kHz is common sampling frequency). We control this by setting the range
 2. To get .WAV working, we use a description of the `.WAV` file format online to jump start the process. We understood that getting `.WAV` to run should consist of iterating through each `.WAV` sample, and sending the corresponding frequency to the `PWM_FIFO`.
 
 ### Difficulties

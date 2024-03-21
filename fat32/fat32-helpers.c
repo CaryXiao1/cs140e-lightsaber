@@ -35,7 +35,7 @@ void fat32_volume_id_check(fat32_boot_sec_t *b) {
 
 void fat32_volume_id_print(const char *msg, fat32_boot_sec_t *b) {
     printk("%s:\n", msg);
-    char oem[9];
+    char oem[12];
     memcpy(oem, b->oem, 8);
     oem[8] = 0;
     char label[12];
