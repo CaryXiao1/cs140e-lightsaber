@@ -2,7 +2,8 @@
 # PROGS += play_wav_light.c
 # PROGS += lightsaber-light-static.c
 # PROGS += driver-gyro.c
-PROGS += light-intensity.c 
+PROGS += gyro-light-audio.c
+# PROGS += light-intensity.c 
 
 LIBS += ./libgcc.a
 

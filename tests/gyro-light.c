@@ -29,8 +29,29 @@
 // to re-use the code.
 #include "rpi.h"
 #include "mpu-6050.h"
+#include "neopixel/WS2812B.h"
+#include "neopixel/neopixel.h"
 
+int clamp(int x, int min, int max) {
+    if (x < min) return min; 
+    if (x > max) return max; 
+    return x; 
+}
 
+// the pin used to control the light strip.
+enum { pix_pin = 21 };
+
+// crude routine to write a pixel at a given location.
+void lights_on(neo_t h, int npixels, int intensity) {
+    int i = 0; // shift;
+    while (i < 64) {
+        // g, r, b
+        neopix_write(h,i, 0x0, intensity ,0x0);
+        i++;
+    }
+
+    neopix_flush(h);
+}
 
 void notmain(void) {
     delay_ms(100);   // allow time for i2c/device to boot up.
@@ -58,23 +79,24 @@ void notmain(void) {
     gyro_t g = mpu6050_gyro_init(dev_addr, gyro_500dps);
     assert(g.dps==500);
 
-    for(int i = 0; i < 100000; i++) {
+    int i = 0;
+    unsigned npixels = 100;  // you'll have to figure this out.
+    neo_t h = neopix_init(pix_pin, npixels);
+
+    while(1) {
         imu_xyz_t xyz_raw = gyro_rd(&g);
         uint32_t g_const = 25000; // 25000 for swing, TODO: figure out the tracking of collisions
         uint32_t scale_max = g_const * g_const; 
-        // output("reading gyro %d\n", i);
 
         // get length of overall movement from 3 component
         uint32_t overall = xyz_raw.y * xyz_raw.y + xyz_raw.z * xyz_raw.z; // xyz_ra w.x * xyz_raw.x + 
-        uint32_t accel_mag = clamp(overall, 0, scale_max) / scale_max; 
-        if (overall >= g_const * g_const) {
-            printk("swing! id=%d\n", i);
-
-        }
-
-
-        // xyz_print("\traw", xyz_raw);
-        // xyz_print("\tscaled (milli dps)", gyro_scale(&g, xyz_raw));
+        float accel_norm = clamp(overall, 100000, scale_max) / (float)scale_max; // normalize to between 0 and 1
+        uint32_t accel_scale = clamp(accel_norm * 255, 10, 255); 
+        
+        // Set lights depending on acceleration
+        lights_on(h, npixels, accel_scale); 
+        printk("swing! id=%d, %d\n", i, accel_scale);
+            
         delay_ms(20);
     }
 }
