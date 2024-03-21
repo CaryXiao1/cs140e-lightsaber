@@ -110,8 +110,8 @@ void set_sample_rate(int sample_rate) {
 }
 
 void audio_init(int sample_rate) {
+    gpio_set_function(18, GPIO_FUNC_ALT5);
     gpio_set_function(12, GPIO_FUNC_ALT0);
-    gpio_set_function(13, GPIO_FUNC_ALT0);
     delay_ms(2);
 
     pwm_init();
