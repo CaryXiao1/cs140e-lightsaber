@@ -7,7 +7,7 @@
 #include "neopixel.h"
 
 // the pin used to control the light strip.
-enum { pix_pin = 21 };
+enum { pix_pin = 14 }; // used to be 21, but is 14 on the lightsaber
 
 // crude routine to write a pixel at a given location.
 void place_cursor(neo_t h, int i) {

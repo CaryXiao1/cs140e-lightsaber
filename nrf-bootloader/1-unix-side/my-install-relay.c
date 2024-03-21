@@ -27,7 +27,8 @@
 static char *progname = 0;
 
 // NOTE: the following line means it only works in nrf-bootloader!
-static const char *RELAY_FILENAME = "../3-relay/relay.bin"; 
+// static const char *RELAY_FILENAME = "../3-relay/relay.bin"; 
+static const char *RELAY_FILENAME = "/Users/caryxiao/repos/cs140e/final-project/nrf-bootloader/3-relay/relay.bin"; 
 
 /**
  * Variation of read_file (from libpi/read_file.c) that reads in two files and concatenates them together.
