@@ -45,7 +45,7 @@ void notmain(void) {
     uint32_t addr = get_code();
     if(!addr)
         rpi_reboot();
-
+    trace("got addr=%x\n", addr);
     // blx to addr.  
     // could also call it as a function pointer.
     BRANCHTO(addr);
