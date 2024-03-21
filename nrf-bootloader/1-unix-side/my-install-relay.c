@@ -26,8 +26,8 @@
 
 static char *progname = 0;
 
-// TODO: add code that uses the CS140E_2024_PATH thing
-static const char *RELAY_FILENAME = "../3-relay/relay.bin";
+// NOTE: the following line means it only works in nrf-bootloader!
+static const char *RELAY_FILENAME = "../3-relay/relay.bin"; 
 
 /**
  * Variation of read_file (from libpi/read_file.c) that reads in two files and concatenates them together.
