@@ -47,7 +47,7 @@ int clamp(int x, int min, int max) {
 }
 
 // the pin used to control the light strip.
-enum { pix_pin = 21 };
+enum { pix_pin = 17 };
 
 // crude routine to write a pixel at a given location.
 void lights_on(neo_t h, int npixels, int intensity) {
@@ -146,8 +146,8 @@ void notmain(void) {
             while (status & PWM_FULL1) {
                 status = pwm_get_status();
             }
-            unsigned wave = data[sample] + 0x8000;
-            uint8_t pcm = wave>>8;
+            unsigned wave = data[sample] + 0x8000; // add 0x8000 to make unsigned and within pwm range
+            uint8_t pcm = wave>>8; // Convert to an 8-bit PCM (pulse code modulation) output
             // printk("pcm: %d\n", pcm);
             pwm_write( pcm );
             pwm_write( pcm );
