@@ -114,10 +114,13 @@ void notmain(void) {
     // init fat32 filesystem
     pi_file_t *file = fat32_read(&fs, &root, FILENAME);
     // skip header
+    // TODO: view header
+    wav_header_t *header = (wav_header_t*)(file->data); 
+    printk("WAV sample rate: %d\n", header->sample_rate);  // confirm sample rate = 44100
     file->data = file->data + sizeof(wav_header_t);
     int16_t *data = (int16_t*)file->data;
     int sample = 0; 
-    int sample_interval = 10000; 
+    int sample_interval = 1000; 
     int max_sample = (file->n_data - sizeof(wav_header_t)) / sizeof(int16_t); 
     printk("max_sample: %d\n", max_sample);
     while(1) {
@@ -134,9 +137,9 @@ void notmain(void) {
 
         // Set lights depending on acceleration
         lights_on(h, npixels, accel_scale); 
-        printk("swing! id=%d, %d, %d\n", i, accel_scale);
+        // printk("swing! id=%d, %d, %d\n", i, accel_scale);
 
-        gpio_set_function(12, GPIO_FUNC_ALT0);
+    
         int sample_end = sample + sample_interval; 
         while(sample < sample_end && sample < max_sample) {
             unsigned status = pwm_get_status();
@@ -145,15 +148,13 @@ void notmain(void) {
             }
             unsigned wave = data[sample] + 0x8000;
             uint8_t pcm = wave>>8;
+            // printk("pcm: %d\n", pcm);
             pwm_write( pcm );
             pwm_write( pcm );
             sample++; 
         }
 
         if (sample == max_sample) sample = 0; 
-        // dummy_pwm_write(); 
-        // delay_ms(20);
-        gpio_set_output(12);
-        gpio_set_off_raw(12); 
+
     }
 }

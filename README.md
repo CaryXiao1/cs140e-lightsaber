@@ -55,13 +55,16 @@ PWM, or Pulse Width Modulation, is a means of emulating analog IO by setting the
 
 ### Method
 
-1. To use hardware PWM, we refer to section 9 in the ARM peripherals manual. We first had to set the proper function of PWM pin 18 (`GPIO_FUNC_ALT5`). Then, similar to I2S, we set the GPIO clock manager to operate using the 19.2MHz oscillator. We use a sampling frequency of around 44100 (44.1kHz is common sampling frequency). We control this by setting the range
-2. To get .WAV working, we use a description of the `.WAV` file format online to jump start the process. We understood that getting `.WAV` to run should consist of iterating through each `.WAV` sample, and sending the corresponding frequency to the `PWM_FIFO`.
+1. To use hardware PWM, we refer to section 9 in the ARM peripherals manual. We first had to set the proper function of PWM pin 18 (`GPIO_FUNC_ALT5`). Then, similar to I2S, we set the GPIO clock manager to operate using the 19.2MHz oscillator. We use a sampling frequency of around 44100 (44.1kHz is common sampling frequency for audio). We control this by setting the `range` of the PWM to `clock_rate` / `sampling_frequency`).
+2. We then played a simple tone by writing to the `RNG1` (range) register and the `DAT1` (data) register. `DAT1` / `RNG1` should be a constant PWM frequency, so we are able to create a basic tone. This is done in `tests/play_tone.c`.
+3. To get .WAV working, we use a description of the `.WAV` file format online to jump start the process (https://ccrma.stanford.edu/courses/422-winter-2014/projects/WaveFormat/#:~:text=A%20WAVE%20file%20is%20often,form%20the%20%22Canonical%20form%22.) We understood that getting `.WAV` to run should consist of iterating through each `.WAV` sample, and sending the corresponding frequency to the `PWM_FIFO`. For this, we additionally enable FIFO in the PWM `CTL` register, and write to `FIF1`. The first test is in `tests/play_wav.c`. Once we were able to play on wav file, we were able to use this code to bring everything together.
 
 ### Difficulties
 
 1. The first difficulty was when setting PWM Peripherals registers, and understanding which mode to use. Thw PWM controller has two submodes where `MSEN=0` and `MSEN=1`. We were initially using `MSEN=0` as the this uses the default PWM algorithm. When reading through the datasheet, it was hard to distinguish the difference between the modes. One seemed to use N/M as the duty cycle, whereas the other described the same duty cycle using different letters M/S. For this, a friend who had taken the class last year was able to help out and suggested trying `MSEN=1`.
-2.
+2. Playing the audio at the same time as the neopixel lights and gyroscope. During our first iteration, we tried to incorporate sending samples to the speaker within the same while loop as our gyro and setting lights. The issue here was that gyro and lights would take extra cycles, and since PWM is dependent on the timing of setting items in FIFO, we would get white noise. A semi-solution was to split the audio file into chunks, and play each chunk at a time. The tradeoff was an evident popping noise. Our solution to the popping was to increase the volume of the original .wav file so that the popping was less apparent. This gave it the illusion of concurrency!
+
+Special shoutout to Joe Tan and Daniel Zamoschin (student in last year's class) who took the time to help us get through these difficulties.
 
 ## Designing the Hilt
 
@@ -71,7 +74,7 @@ While this is not necessarily related to computer systems, we did spend a non-ne
 
 ## Putting it Together
 
-After implementing the individual components, we had to create a script that would incorporate all the APIs we had written thus far for each of the protocols. In particular, using the accelerometer and gyro to influence the light output of our neopixel
+After implementing the individual components, we had to create a script that would incorporate all the APIs we had written thus far for each of the protocols. In particular, using the accelerometer and gyro to influence the light output of our neopixel light strip, while simulatenously getting audio to play.
 
 # Additional Protocols
 

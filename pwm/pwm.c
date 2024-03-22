@@ -130,6 +130,7 @@ void audio_init(int sample_rate) {
     pwm_set_fifo(0, 1);
     pwm_set_fifo(1, 1);
 
+    // enable both channels
     pwm_enable(0);
     pwm_enable(1);
 

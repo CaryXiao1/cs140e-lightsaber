@@ -18,7 +18,7 @@ COMMON_SRC += fat32/mbr.c fat32/pi-sd.c fat32/mbr-helpers.c fat32/fat32-helpers.
 COMMON_SRC += neopixel/neopixel.c
 COMMON_SRC += i2c/i2c.c
 
-CFLAGS_EXTRA  = -O3 -I fat32/external-code -I i2s/ -I nrf/ -I pwm/ -I fat32/ -I audio/
+CFLAGS_EXTRA  = -Wno-strict-aliasing -O3 -I fat32/external-code -I i2s/ -I nrf/ -I pwm/ -I fat32/ -I audio/
 
 # define this if you need to give the device for your pi
 TTYUSB = 
