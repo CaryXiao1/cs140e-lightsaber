@@ -76,6 +76,12 @@ While this is not necessarily related to computer systems, we did spend a non-ne
 
 After implementing the individual components, we had to create a script that would incorporate all the APIs we had written thus far for each of the protocols. In particular, using the accelerometer and gyro to influence the light output of our neopixel light strip, while simulatenously getting audio to play.
 
+### Method
+
+1. First, get `tests/gyro-light.c` to work. We decided to tackle this in pairwise chunks. Our first pair was getting gyro and light to work concurrently. Our idea was to use the magnitude of the acceleration vector. After normalizing acceleration vectors, we use this proportion out of 255 to get a light value for the neopixels. This seems to work well.
+2. `tests/play_wav_light.c` Plays the light and the audio at the same time, but at a constant light intensity.
+3. Finally, `gyro-light-audio.c` is our main script, which plays the audio, gyro and light at the same time. See `pwm` section for details about implementation.
+
 # Additional Protocols
 
 ## I2C
