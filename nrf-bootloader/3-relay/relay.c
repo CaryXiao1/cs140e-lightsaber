@@ -22,6 +22,7 @@ static const int PRINT_DEBUG = 1;
 #if 1
 #include "nrf-test.h"
 #include "nrf-default-values.h"
+#include "boot-crc32.h"
 
 // max message size.
 typedef struct {
@@ -107,6 +108,8 @@ void notmain(void) {
     memcpy(data_stack + 1, head_start + 1, s2);
     uint32_t *data = kmalloc(s2 + 4);
     memcpy(data, data_stack, s2 + 4);
+
+    printk("crc32 hash of second program = %d\n", crc32(data + 1, s2));
     
     // send code to client
     trace("configuring reliable (acked) server=[%x] with %d nbyte msgs\n",

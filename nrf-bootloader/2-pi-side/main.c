@@ -42,10 +42,14 @@ static void boot_put8(uint8_t x) {
 #include "get-code.h"
 
 void notmain(void) {
+    printk("starting main.c\n");
     uint32_t addr = get_code();
     if(!addr)
         rpi_reboot();
     trace("got addr=%x\n", addr);
+    printk("prog_end=%x\n", __prog_end__);
+    delay_ms(100);
+
     // blx to addr.  
     // could also call it as a function pointer.
     BRANCHTO(addr);

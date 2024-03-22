@@ -17,60 +17,11 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <termios.h>
-#include <assert.h>
-#include <fcntl.h>
-#include <unistd.h>
 
 #include "libunix.h"
 #include "put-code.h"
 
 static char *progname = 0;
-
-// NOTE: the following line means it only works in nrf-bootloader!
-// static const char *RELAY_FILENAME = "../3-relay/relay.bin"; 
-static const char *RELAY_FILENAME = "/Users/caryxiao/repos/cs140e/final-project/nrf-bootloader/3-relay/relay.bin"; 
-
-/**
- * Variation of read_file (from libpi/read_file.c) that reads in two files and concatenates them together.
- * Also adds a header that tells how long the header is and the length of the
- * second length of code.
- * Primarily used in final-project/nrf-bootloader/my-install-relay.c
- * 
-*/
-void *read_file_relay(unsigned *size, const char *name1, const char *name2) {
-    const uint32_t HEADER_SIZE = 4; // contains 1. header size and 2. 
-    struct stat info;
-    if (stat(name1, &info) != 0) panic("file path: stat() failed on name1.");
-    unsigned s1 = info.st_size;
-    if (stat(name2, &info) != 0) panic("file path: stat() failed on name2.");
-    unsigned s2 = info.st_size;
-    // round up to next multiple of 32!
-    unsigned s_up = s1 + s2 + HEADER_SIZE + 32;
-    trace("file1 size=%d, file2 size=%d, HEADER_SIZE=%d, s_up=%d\n", s1, s2, HEADER_SIZE, s_up);
-    // alloc space
-    char *buf = calloc(1, s_up);
-    int fd1 = open(name1, O_RDONLY);
-    int fd2 = open(name2, O_RDONLY);
-
-
-    if (s1 != 0) read_exact(fd1, buf, s1);
-    // set start of next program, round up to next multiple of 32
-    // based on my (Cary's) understanding, __prog_end__ on the pi needs to be a multiple of 32
-    // so we do the same to align the code with __prog_end__. 
-    uint32_t offset_correction = (8 - ((unsigned long)buf + s1) % 8) + 16; // (((unsigned long)buf + s1) % 32 != 0) ? (32 - ((unsigned long)buf + s1) % 32) : 0;
-    uint32_t *head_start = (uint32_t *)(buf + s1 + offset_correction); // round up to next multiple of 8
-    printf("buf=%lx, head_start=%lx, size=%lu\n", (unsigned long)buf, (unsigned long) head_start, (unsigned long) head_start - (unsigned long) buf);
-    assert(((unsigned long) head_start & 0b111l) == 0); // make sure 
-    *(head_start) = s2;
-    
-    if (s2 != 0) read_exact(fd2, head_start + (HEADER_SIZE / 4), s2);
-    *size = s1 + s2 + HEADER_SIZE;
-    close(fd1);
-    close(fd2);
-    return buf;
-}
-
-
 
 static void usage(const char *msg, ...) {
     va_list args;
@@ -116,7 +67,7 @@ int main(int argc, char *argv[]) {
     unsigned baud_rate = B115200;
 
     // by default is 0x8000
-    unsigned boot_addr = ARMBASE;
+    // unsigned boot_addr = ARMBASE;
 
     // we do manual option parsing to make things a bit more obvious.
     // you might rewrite using getopt().
@@ -145,7 +96,7 @@ int main(int argc, char *argv[]) {
             i++;
             if(!argv[i])
                 usage("missing argument to --addr\n");
-            boot_addr = atoi(argv[i]);
+            // boot_addr = atoi(argv[i]);
         } else if(strcmp(argv[i], "--exec") == 0) {
             i++;
             if(!argv[i])
@@ -161,8 +112,8 @@ int main(int argc, char *argv[]) {
             usage("unexpected argument=<%s>\n", argv[i]);
         }
     }
-    if(!pi_prog)
-        usage("no pi program\n");
+    // if(!pi_prog)
+    //     usage("no pi program\n");
 
     // 1. get the name of the ttyUSB.
     if(!dev_name) {
@@ -170,8 +121,8 @@ int main(int argc, char *argv[]) {
         if(!dev_name)
             panic("didn't find a device\n");
     }
-    // debug_output("done with options: dev name=<%s>, pi-prog=<%s>, trace=%d\n", 
-    //         dev_name, pi_prog, trace_p);
+    debug_output("done with options: dev name=<%s>, pi-prog=<%s>, trace=%d\n", 
+            dev_name, pi_prog, trace_p);
 
     if(exec_argv)
         argv_print("BOOT: --exec argv:", exec_argv);
@@ -195,13 +146,13 @@ int main(int argc, char *argv[]) {
 
     // 3. read in program [probably should just make a <file_size>
     //    call and then shard out the pieces].
-	unsigned nbytes;
-    uint8_t *code = (uint8_t *) read_file_relay(&nbytes, RELAY_FILENAME, pi_prog);
-    printf("nbytes=%d\n", nbytes);
-    // 4. let's send it!
-	debug_output("%s: tty-usb=<%s> program=<%s>: about to boot\n", 
-                progname, dev_name, pi_prog);
-    simple_boot(fd, boot_addr, code, nbytes);
+    //     unsigned nbytes;
+    // uint8_t *code = read_file(&nbytes, pi_prog);
+
+    // // 4. let's send it!
+    //     debug_output("%s: tty-usb=<%s> program=<%s>: about to boot\n", 
+    //             progname, dev_name, pi_prog);
+    // simple_boot(fd, boot_addr, code, nbytes);
 
     // 5. echo output from pi
     if(!exec_argv)
@@ -210,5 +161,5 @@ int main(int argc, char *argv[]) {
         todo("not handling exec_argv");
         handoff_to(fd, TRACE_FD, exec_argv);
     }
-	return 0;
+        return 0;
 }

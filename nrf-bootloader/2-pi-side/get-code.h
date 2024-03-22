@@ -60,7 +60,10 @@ get_code_ack(nrf_t *c, uint32_t server_addr) {
     while (!net_get32(c, &got)) {
         if (wait++ % 2000 == 0) printk(".");
     }
-    printk("\nreceived header, now getting %d bytes.", got);
+    printk("\nreceived header, now getting %d bytes.\n", got);
+    printk("bootloader start=%x. end=%x\n", (uint32_t) &put32, (uint32_t) __prog_end__);
+    printk("prog start=%x. end=%x\n", ARMBASE, (uint32_t) ARMBASE + got);
+
     // first value should be length!
     uint32_t *data = (uint32_t *) ARMBASE;
     npackets++;
@@ -79,8 +82,8 @@ get_code_ack(nrf_t *c, uint32_t server_addr) {
     for (int i = 0; i < 10; i++) {
         printk("i=%d, val=%x\n", i, data[i]);
     }
-    // *data_set = data;
-    // return got + 4;
+    printk("crc32 of program=%d\n", crc32(data, got));
+    delay_ms(500);
 }
 
 // IMPLEMENT this routine.
