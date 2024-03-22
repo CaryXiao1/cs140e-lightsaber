@@ -1,5 +1,5 @@
 PROGS = my-install.c
-PROGS += my-install-relay.c
+PROGS += my-install-relay.c pi-echo.c
 COMMON_SRC = put-code.c put-get.c 
 CFLAGS += -I../2-pi-side
 

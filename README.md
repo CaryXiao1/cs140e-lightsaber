@@ -7,9 +7,17 @@ For our final project, we created a lightsaber prototype. On top of using variou
 
 ![Picture of lightsaber we built](images/lightsaber-tmp.jpg)
 
-## Overall Design
-
 As an overview of the lightsaber itself, we designed and 3D-printed a hilt on top of a 24-inch plexiglass tube. We continuously sample from a gyroscope to determine the acceleration of the blade and use that information to determine how loud the sound of the lightsaber should play. Furthermore, we keep track of the direction of acceleration on the lightsaber, and if the direction suddenly changes, we detect that as a collision and briefly change the sound of the lightsaber accordingly.
+
+### Demos
+
+You can find the following demos of the lightsaber between the root folder of this repository and in `tests/`. 
+
+- `gyro-light-audio.c`: This program incorporates the most functionality, using the speaker, gyroscope, and light strip to create a lightsaber demo. Because of the limitations of compute power in the r/pi and because the light strip and sound require very specific timing to correctly function, this demo has a lower sampling rate and some popping artifacts in the 
+
+- `tests/gyro-light.c`: This program does not use the speaker, allowing for us to much more quickly change the brightness of the light strip to correspond to the acceleration in the accelerometer.
+
+- `play_wav_light.c`: This program removes the gyroscope and keeps the light a specific color, allowing us to fully play the .wav file while having the blade lit.
 
 ## Networked Bootloader
 
